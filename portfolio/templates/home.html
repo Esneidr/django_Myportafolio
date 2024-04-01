@@ -1,0 +1,66 @@
+{% extends 'layout.html' %} {% block content %} {% load static %}
+
+<header class="row" bg-black>
+  <div class="col-md-4">
+    <img src="{% static 'portfolio/Silueta.png' %}" />
+  </div>
+
+  <div class="col-md-8 my-auto">
+    <h1>i am <strong> Esneider Cordoba</strong></h1>
+    <h3>I am a aprendy de Big Data</h3>
+    <p>
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque voluptates
+      velit, atque sed illum doloremque, sapiente maxime, corrupti praesentium
+      quisquam possimus harum! Explicabo ex labore molestias harum aliquid esse,
+      quam amet, minus omnis eveniet ducimus eos deserunt repudiandae fuga ipsam
+      quasi, consequuntur quibusdam quod? Nam cupiditate deleniti sint commodi
+      saepe neque tenetur eaque. Vitae laborum quam voluptate ex quis veniam ad
+      aperiam odit impedit labore blanditiis itaque dolore quisquam sed,
+      veritatis beatae nisi omnis. Placeat nisi, sapiente voluptas tenetur,
+      aperiam eum vel dolor expedita aliquam, quos perferendis. Aliquam
+      laudantium debitis repudiandae maxime porro sed et libero ipsum doloribus!
+      Possimus, dolorem?.
+    </p>
+    <a
+      href="{% static 'portfolio/cv.PDF' %}"
+      class="btn btn-primary btn-lg rounded-0 my-3"
+      target="_blank"
+      >Download CV</a
+    >
+  </div>
+</header>
+
+<div class="row my-4 text-center">
+  <h3>My Projects</h3>
+  <p>
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Mollitia,
+    voluptate.
+  </p>
+
+  {% for portfolio in portfolios %}
+
+  <div class="col-md-4 p-4">
+    <div class="card bg-black card-project">
+      <img
+        src="{{portfolio.image.url}}"
+        alt="{{portfolio.title}}"
+        class="card-img-top"
+      />
+      <div class="card-body">
+        <h2>{{portfolio.title}}</h2>
+        <p>{{portfolio.description}}</p>
+
+        {% if portfolio.url %}
+        <a
+          href="{{portfolio.url}}"
+          class="btn btn-light rounded-0 bth-sm"
+          target="_blank"
+          >{{portfolio.url}}</a
+        >
+
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %} {% endblock %}
+</div>

@@ -1,0 +1,188 @@
+Django Python (Parte 1)
+
+1. Crear una carpeta con el nombre del proyecto.
+
+2. Ingresar al cmd (window + R), seleccionar la carpeta donde voy a trabajar el proyecto.
+
+3. Se crea el entorno virtual: pip install virtualenv
+
+4. Se le indica a python que use un modulo (python -m) y despues se le da un nombre virtualenv venv : python -m virtualenv venv
+
+5. Se debe activar el entonor virtual, con el nombre de tu entorno: venv\Scripts\activate
+
+6. ingresamos Visual srudio code: code .
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Visual Studio Code (Parte 2)
+
+1. Python seleccionar interpetre: python (versión) ('venv':venv) o Abrimos una nueva terminal y volvemos a ejecutar: venv\Scripts\activate
+ 
+2. Instalamos django en nuestro proyecto: pip install django
+
+3. Iniciamos el proyecto: django-admin startproject nombre_del_proyecto . para que se cree dentro de la carpeta base
+
+4. Corremos nuestro proyecto: python manage.py runserver nota: ctrl + c deja funcionar el runserver
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Parte 3
+
+1. Para crear una nueva aplicación dentro de tu proyecto Django: python manage.py startapp nombre_de_la_aplicacion
+
+2. Para Que django reconozca esta nueva app, se ingresa a la carpeta de configuracion del proyecto (Parte 2 -3), ingresamos en settins.py y buscamos INSTALLED_APPS[] y escribos el nombre de la nueva app (Parte 3 -1) abajo de las otras app que trae por defecto entre comillas simples.
+
+3. Para crear las tablas de la base de datos, se ingresa en models.py de la app que se deseas abordar.
+
+   from django.db.models.fields import CharField, URLField
+   from django.db.models.fields.files import ImageField 
+
+   # creamos una class que va ha heredar de models
+   class blog(models.model):
+    title = CharField(max_length=100)
+    description = CharField(max_length=250)
+    image = ImageField(upload_to='blog/images/')
+    url = URLField(blank=True) 
+
+4. Para el procesamiento de imágenes en Python se instalamos la biblioteca Pillow: pip install pillow
+
+5. Despues de haber creado los models, se necesita aplicar migraciones a la base de datos utilizando el comando:python manage.py makemigrations seguido python manage.py migrate
+
+6. Corremos nuestro proyecto: python manage.py runserver nota: ctrl + c deja funcionar el runserver
+
+	localhost/admin
+
+7. Crear usario administrador del proyecto: python manage.py createsuperuser
+	
+	Usuario admin: wesley
+	Contraseña: wesley9510
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Agregar los models a una pagina 
+
+En este caso se hara para la pagina de administradores
+
+1. Se ingresa a la carpeta de la app (Parte 3 -1). en admin.py
+
+	from .models import blog
+        
+	admin.site.register(blog)
+
+- Se recomienda crear la carpeta urls.py para cada aplicacion, asi se lleva un control más eficiente
+
+2. Creamos una carpeta media en el directorio base (Parte 2 -3):
+	-Ingresa a settings.py 
+	-Abajo de STACTIC_URL: agregar MEDIA_ROOT = BASE_DIR / 'media' abajo MEDIA_URL = '/public/'
+	-se rejistra las URL: 
+
+		from django.conf.urls.static import static
+		from django.conf import settings
+		from portfolio import views
+
+		urlpatterns = [
+    		path('admin/', admin.site.urls),
+    		path('',views.home, name='home'),
+		]
+
+		urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+		urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+	-Agregamos una Views en la en la app (portfolio)
+
+		from .models import portfolio
+
+		def home(request):
+    		  portfolios = portfolio.objects.all()
+    		  return render(request, 'home.html', {'portfolios': portfolios})
+
+
+	-Se crea la carpeta templates para agregar las interfaces de usuario (Porfolio)
+
+		se crea archivo.html: home.html
+		
+		Comenzamos a configurar la pagina principal
+		<h1>Home</h1>
+
+		{% for portfolio in portfolios %}
+
+		<h2>{{portfolio.title}}</h2>
+		<p>{{portfolio.description}}</p>
+		<img src="{{portfolio.image.url}}" alt="{{portfolio.title}}">
+
+		{% if portfolio.url %}
+		<a href="{{portfolio.url}}">{{portfolio.url}}</a>
+		{% endif %}
+
+		{% endfor %}
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Para otra aplicación (Blog)
+
+1. Se crea la carpeta Templates y agregamos un archivo html (posts.html)
+
+2. En views, se crea una funcion para acceder a posts.html 
+
+	def render_posts(request):
+    	   return render(request, 'posts.html')
+
+3.se crea la urls.py
+
+	from django.urls import path
+	from .views import render_posts
+
+	urlpatterns = [
+    	   path('', render_posts, name='posts')
+	]	
+4. Despues nos accedemos a la carpeta principal en Urls.py y agremos post.html
+
+	from django.urls import path, include 
+
+	path('blog/', include('blog.urls')) # Se dice que incluya todo lo que hay en la carpeta urls del blog
+
+5. Se crea su modelo de datos en models.py
+
+	import datetime
+ 
+	   class Post(models.Model):
+    	   title = models.CharField(max_length=100)
+    	   description = models.TextField()
+    	   image = models.ImageField(upload_to='blog/images')
+    	   date = models.DateField(datetime.date.today)
+
+6. Se registra el modelo en admin.py 
+
+	from .models import Post
+
+	admin.site.register(Post)
+
+7. Se realizan las migraciones python manage.py makemigrations seguido python manage.py migrate
+
+8. Para acceder a las publiciones del blog, nos dirigimos a views.py 
+
+	from .models import Post
+
+	def render_posts(request):
+    	  posts = Post.objects.all()
+    	  return render(request, 'posts.html', {'posts': posts})
+
+9. En templates configuramos la vista de Post.html
+
+	<h1>Posts</h1>
+
+	{% for post in posts %}
+
+	<h2>{{post.title}}</h2>
+	<h3>{{post.date}}</h3>
+
+	<p>{{post.description}}</p>
+	<img src="{{post.image.url}}" alt="{{post.title}}">
+
+	{% endfor %}
+
+10. Para ver solo una publicación, ingresamos a urls.py (blog)
+
+
+
+
